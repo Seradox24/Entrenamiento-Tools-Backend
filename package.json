@@ -1,0 +1,23 @@
+{
+  "name": "djangoback",
+  "version": "1.0.0",
+  "description": "Base Django + DRF con Tailwind local",
+  "private": true,
+  "scripts": {
+    "css:build": "tailwindcss -i ./assets/css/input.css -o ./static/css/app.css --minify",
+    "css:watch": "tailwindcss -i ./assets/css/input.css -o ./static/css/app.css --watch",
+    "dev": "powershell -ExecutionPolicy Bypass -File ./scripts/dev.ps1"
+  },
+  "keywords": [
+    "django",
+    "drf",
+    "tailwind"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.2",
+    "tailwindcss": "^4.3.2"
+  }
+}

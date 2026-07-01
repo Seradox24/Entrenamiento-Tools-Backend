@@ -1,0 +1,65 @@
+{% extends "authenticated.html" %}
+
+{% block title %}{{ title }} | Django Back{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Solo usuarios normales, sin permisos de staff ni superusuario{% endblock %}
+
+{% block page_actions %}
+  <a class="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-800 transition hover:border-zinc-400 hover:bg-zinc-50" href="{% url 'normal-user-list' %}">
+    Volver
+  </a>
+{% endblock %}
+
+{% block app_content %}
+<form method="post" class="max-w-4xl rounded-md border border-zinc-200 bg-white p-6 shadow-sm">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+    <div class="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      {% for error in form.non_field_errors %}
+        <p>{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="grid gap-5 sm:grid-cols-2">
+    {% for field in form %}
+      <div class="{% if field.name == 'is_active' %}sm:col-span-2{% endif %}">
+        {% if field.field.widget.input_type == "checkbox" %}
+          <label class="flex items-center gap-3 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm font-medium text-zinc-800">
+            {{ field }}
+            {{ field.label }}
+          </label>
+        {% else %}
+          <label class="mb-2 block text-sm font-medium text-zinc-800" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <input
+            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15"
+            id="{{ field.id_for_label }}"
+            name="{{ field.html_name }}"
+            type="{{ field.field.widget.input_type|default:'text' }}"
+            value="{{ field.value|default_if_none:'' }}"
+            {% if field.field.required %}required{% endif %}
+          >
+        {% endif %}
+
+        {% if field.help_text %}
+          <p class="mt-1 text-xs leading-5 text-zinc-500">{{ field.help_text }}</p>
+        {% endif %}
+
+        {% for error in field.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-6 flex justify-end gap-3">
+    <a class="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-800 transition hover:border-zinc-400 hover:bg-zinc-50" href="{% url 'normal-user-list' %}">
+      Cancelar
+    </a>
+    <button class="rounded-md bg-zinc-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800" type="submit">
+      {{ submit_label }}
+    </button>
+  </div>
+</form>
+{% endblock %}

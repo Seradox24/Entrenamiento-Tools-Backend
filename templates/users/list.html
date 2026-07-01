@@ -1,0 +1,54 @@
+{% extends "authenticated.html" %}
+
+{% block title %}Usuarios | Django Back{% endblock %}
+{% block page_title %}Usuarios normales{% endblock %}
+{% block page_subtitle %}Crear y modificar cuentas sin permisos de superusuario{% endblock %}
+
+{% block page_actions %}
+  <a class="rounded-md bg-zinc-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-zinc-800" href="{% url 'normal-user-create' %}">
+    Nuevo usuario
+  </a>
+{% endblock %}
+
+{% block app_content %}
+<section class="overflow-hidden rounded-md border border-zinc-200 bg-white shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="w-full min-w-[720px] text-left text-sm">
+      <thead class="border-b border-zinc-200 bg-zinc-50 text-xs uppercase tracking-[0.12em] text-zinc-500">
+        <tr>
+          <th class="px-4 py-3 font-semibold">Usuario</th>
+          <th class="px-4 py-3 font-semibold">Nombre</th>
+          <th class="px-4 py-3 font-semibold">Email</th>
+          <th class="px-4 py-3 font-semibold">Estado</th>
+          <th class="px-4 py-3 text-right font-semibold">Accion</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-zinc-200">
+        {% for user in users %}
+          <tr class="text-zinc-700">
+            <td class="px-4 py-3 font-medium text-zinc-950">{{ user.username }}</td>
+            <td class="px-4 py-3">{{ user.get_full_name|default:"-" }}</td>
+            <td class="px-4 py-3">{{ user.email|default:"-" }}</td>
+            <td class="px-4 py-3">
+              {% if user.is_active %}
+                <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">Activo</span>
+              {% else %}
+                <span class="rounded-md bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-600">Inactivo</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <a class="font-medium text-emerald-700 hover:text-emerald-800" href="{% url 'normal-user-update' user.pk %}">
+                Editar
+              </a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td class="px-4 py-8 text-center text-sm text-zinc-500" colspan="5">No hay usuarios normales creados.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

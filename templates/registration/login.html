@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Ingresar | Django Back{% endblock %}
+
+{% block content %}
+<main class="grid min-h-screen bg-stone-100 lg:grid-cols-[minmax(0,1fr)_460px]">
+  <section class="relative hidden overflow-hidden bg-zinc-950 px-12 py-10 text-white lg:flex lg:flex-col lg:justify-between">
+    <div class="absolute inset-0 opacity-30">
+      <div class="h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(16,185,129,0.28),transparent_32%),radial-gradient(circle_at_80%_30%,rgba(14,165,233,0.24),transparent_30%),linear-gradient(135deg,#09090b,#18181b_48%,#064e3b)]"></div>
+    </div>
+    <div class="relative z-10 flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-md bg-emerald-400 text-base font-bold text-zinc-950">DB</div>
+      <span class="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-100">Django Back</span>
+    </div>
+    <div class="relative z-10 max-w-xl space-y-5">
+      <p class="text-sm font-medium uppercase tracking-[0.2em] text-emerald-200">Panel privado</p>
+      <h1 class="text-5xl font-semibold leading-tight tracking-normal">Administra tu API desde una base limpia y local.</h1>
+      <p class="max-w-md text-base leading-7 text-zinc-300">
+        Acceso preparado para Django, REST Framework, SQLite y assets compilados localmente con Tailwind.
+      </p>
+    </div>
+    <div class="relative z-10 grid grid-cols-3 gap-3 text-sm text-zinc-300">
+      <div class="rounded-md border border-white/10 bg-white/5 p-4">
+        <span class="block text-lg font-semibold text-white">DRF</span>
+        API base
+      </div>
+      <div class="rounded-md border border-white/10 bg-white/5 p-4">
+        <span class="block text-lg font-semibold text-white">SQLite</span>
+        Local first
+      </div>
+      <div class="rounded-md border border-white/10 bg-white/5 p-4">
+        <span class="block text-lg font-semibold text-white">Tailwind</span>
+        Sin CDN
+      </div>
+    </div>
+  </section>
+
+  <section class="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">
+    <div class="w-full max-w-sm">
+      <div class="mb-10 lg:hidden">
+        <div class="mb-5 flex h-11 w-11 items-center justify-center rounded-md bg-zinc-950 text-base font-bold text-white">DB</div>
+        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">Django Back</p>
+      </div>
+
+      <div class="mb-8 space-y-2">
+        <h2 class="text-3xl font-semibold tracking-normal text-zinc-950">Inicia sesion</h2>
+        <p class="text-sm leading-6 text-zinc-600">Ingresa con tu usuario de Django para continuar al home.</p>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form method="post" class="space-y-5">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-zinc-800" for="{{ form.username.id_for_label }}">Usuario</label>
+          <input
+            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15"
+            id="{{ form.username.id_for_label }}"
+            name="{{ form.username.html_name }}"
+            type="text"
+            value="{{ form.username.value|default_if_none:'' }}"
+            autocomplete="username"
+            required
+            autofocus
+          >
+          {% for error in form.username.errors %}
+            <p class="text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-zinc-800" for="{{ form.password.id_for_label }}">Contrasena</label>
+          <input
+            class="w-full rounded-md border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15"
+            id="{{ form.password.id_for_label }}"
+            name="{{ form.password.html_name }}"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+          {% for error in form.password.errors %}
+            <p class="text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <button class="w-full rounded-md bg-zinc-950 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-zinc-800 focus:outline-none focus:ring-4 focus:ring-zinc-950/20" type="submit">
+          Entrar
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-xs leading-5 text-zinc-500">
+        Acceso reservado para usuarios autorizados.
+      </p>
+    </div>
+  </section>
+</main>
+{% endblock %}

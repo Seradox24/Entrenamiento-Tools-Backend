@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@source "../../templates";
+@source "../../api";
+
+@layer components {
+  @media (min-width: 1024px) {
+    [data-sidebar-state="collapsed"] #app-sidebar {
+      width: 76px;
+    }
+
+    [data-sidebar-state="collapsed"] .sidebar-label {
+      display: none;
+    }
+
+    [data-sidebar-state="collapsed"] .sidebar-link {
+      justify-content: center;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    [data-sidebar-state="collapsed"] .sidebar-collapse-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
