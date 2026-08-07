@@ -2,11 +2,16 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
+from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .forms import NormalUserCreationForm, NormalUserUpdateForm, ProjectForm
 from .models import Project
+from .permissions import IsSuperUser
+from .serializers import ProjectSerializer
 
 
 User = get_user_model()
@@ -108,7 +113,14 @@ def project_admin(request, pk=None):
     )
 
 
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    permission_classes = [IsSuperUser]
+
+
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def health_check(request):
     return Response(
         {

@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from .models import Project
 
@@ -148,3 +150,73 @@ class ProjectAdminTests(TestCase):
         self.assertEqual(project.name, "Proyecto B")
         self.assertRedirects(delete_response, reverse("project-admin"))
         self.assertFalse(Project.objects.filter(pk=project.pk).exists())
+
+
+class ProjectApiTests(APITestCase):
+    def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="api-admin",
+            email="api-admin@example.com",
+            password="password123",
+        )
+        self.normal_user = User.objects.create_user(
+            username="api-user",
+            email="api-user@example.com",
+            password="password123",
+        )
+        self.project = Project.objects.create(name="Proyecto API")
+
+    def test_health_check_is_public(self):
+        response = self.client.get(reverse("api-health"))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["status"], "ok")
+
+    def test_project_api_rejects_users_without_superuser_permission(self):
+        anonymous_response = self.client.get(reverse("project-list"))
+
+        self.client.force_authenticate(user=self.normal_user)
+        normal_user_response = self.client.get(reverse("project-list"))
+
+        self.assertEqual(anonymous_response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(normal_user_response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_superuser_can_list_and_retrieve_projects(self):
+        self.client.force_authenticate(user=self.superuser)
+
+        list_response = self.client.get(reverse("project-list"))
+        detail_response = self.client.get(
+            reverse("project-detail", args=[self.project.pk])
+        )
+
+        self.assertEqual(list_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(list_response.data[0]["name"], "Proyecto API")
+        self.assertEqual(detail_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail_response.data["id"], self.project.pk)
+
+    def test_superuser_can_create_update_and_delete_projects(self):
+        self.client.force_authenticate(user=self.superuser)
+
+        create_response = self.client.post(
+            reverse("project-list"),
+            {"name": "Proyecto creado desde API"},
+            format="json",
+        )
+        self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
+        project_id = create_response.data["id"]
+
+        update_response = self.client.patch(
+            reverse("project-detail", args=[project_id]),
+            {"name": "Proyecto actualizado desde API"},
+            format="json",
+        )
+        delete_response = self.client.delete(
+            reverse("project-detail", args=[project_id])
+        )
+
+        self.assertEqual(update_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            update_response.data["name"], "Proyecto actualizado desde API"
+        )
+        self.assertEqual(delete_response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Project.objects.filter(pk=project_id).exists())

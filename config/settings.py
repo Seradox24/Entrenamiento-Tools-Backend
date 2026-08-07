@@ -24,6 +24,12 @@ INSTALLED_APPS = [
     "rest_framework",
     "imagekit",
     "api",
+    "moodle_integration.apps.MoodleIntegrationConfig",
+    "identity.apps.IdentityConfig",
+    "application_api.apps.ApplicationApiConfig",
+    "lrs.apps.LrsConfig",
+    "instructor.apps.InstructorConfig",
+    "analytics.apps.AnalyticsConfig",
     "django_cleanup.apps.CleanupConfig",
 ]
 
@@ -97,6 +103,13 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
