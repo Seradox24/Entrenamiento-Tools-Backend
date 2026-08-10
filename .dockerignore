@@ -1,0 +1,38 @@
+# Git y configuracion local
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Variables de entorno
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node y Tailwind
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Datos y archivos generados localmente
+*.sqlite3
+*.sqlite3-*
+media/
+staticfiles/
+agente/
+*.log
