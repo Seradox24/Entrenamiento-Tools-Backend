@@ -4,6 +4,12 @@ SOM LRS es una aplicacion Django + Django REST Framework desplegada con Gunicorn
 
 Toda la aplicacion vive bajo el prefijo `/som/`. PostgreSQL permanece privado dentro de la red Docker y no publica puertos al host.
 
+## Contexto del proyecto
+
+> **Nota:** antes de modificar la arquitectura, el despliegue, las variables de entorno o las integraciones, revisar [`context.md`](context.md). Ese documento describe el contexto operativo vigente de SOM LRS y sus limites de integracion con Moodle y la infraestructura del servidor.
+
+<!-- Mantener esta referencia sincronizada cuando cambie el contexto operativo del proyecto. -->
+
 ## Ejecucion
 
 Crear manualmente `.env.prod` en la raiz y ejecutar:
@@ -29,5 +35,3 @@ La administracion de proyectos esta disponible solo para superusuarios.
 
 Con el servidor en ejecucion, un superusuario puede usar la API navegable desde
 `http://127.0.0.1:8000/som/api/` o autenticarse con HTTP Basic desde un cliente REST.
-
-La configuracion operativa y los limites de integracion estan documentados en `context.md`.
