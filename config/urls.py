@@ -12,7 +12,7 @@ from api.views import (
     project_admin,
 )
 
-urlpatterns = [
+som_urlpatterns = [
     path(
         "",
         LoginView.as_view(
@@ -27,9 +27,14 @@ urlpatterns = [
     path("home/users/", normal_user_list, name="normal-user-list"),
     path("home/users/new/", normal_user_create, name="normal-user-create"),
     path("home/users/<int:pk>/edit/", normal_user_update, name="normal-user-update"),
+    path("lrs/", include("lrs.urls")),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
+]
+
+urlpatterns = [
+    path("som/", include(som_urlpatterns)),
 ]
 
 if settings.DEBUG:

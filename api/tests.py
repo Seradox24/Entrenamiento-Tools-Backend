@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -8,6 +8,16 @@ from .models import Project
 
 
 User = get_user_model()
+
+
+class SomRouteScopeTests(SimpleTestCase):
+    def test_application_routes_are_scoped_under_som(self):
+        self.assertEqual(reverse("login"), "/som/")
+        self.assertEqual(reverse("home"), "/som/home/")
+        self.assertEqual(reverse("project-admin"), "/som/home/projects/")
+        self.assertEqual(reverse("normal-user-list"), "/som/home/users/")
+        self.assertEqual(reverse("api-health"), "/som/api/health/")
+        self.assertEqual(reverse("project-list"), "/som/api/projects/")
 
 
 class NormalUserManagementTests(TestCase):
@@ -27,7 +37,7 @@ class NormalUserManagementTests(TestCase):
         response = self.client.get(reverse("normal-user-list"))
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response["Location"].startswith("/?next="))
+        self.assertTrue(response["Location"].startswith("/som/?next="))
 
     def test_normal_users_cannot_access_management_views(self):
         self.client.force_login(self.normal_user)
@@ -119,7 +129,7 @@ class ProjectAdminTests(TestCase):
         normal_response = self.client.get(reverse("project-admin"))
 
         self.assertEqual(anonymous_response.status_code, 302)
-        self.assertTrue(anonymous_response["Location"].startswith("/?next="))
+        self.assertTrue(anonymous_response["Location"].startswith("/som/?next="))
         self.assertEqual(normal_response.status_code, 403)
 
     def test_superuser_can_create_update_and_delete_project(self):

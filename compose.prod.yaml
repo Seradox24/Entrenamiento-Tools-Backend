@@ -1,57 +1,52 @@
 services:
-
   web:
     build:
       context: .
-
     command: >
       sh -c "python manage.py migrate --noinput &&
+      python manage.py collectstatic --noinput &&
       gunicorn config.wsgi:application
       --bind 0.0.0.0:8000
       --workers 2
       --timeout 60"
-
     ports:
       - "127.0.0.1:8000:8000"
-
     env_file:
       - .env.prod
-
     depends_on:
       db:
         condition: service_healthy
-
     restart: unless-stopped
-
     networks:
-      - webnet
-
+      - som_internal
+      - som_egress
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; request = urllib.request.Request('http://127.0.0.1:8000/som/api/health/', headers={'X-Forwarded-Proto': 'https'}); urllib.request.urlopen(request, timeout=5)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   db:
-    image: postgres:16
-
+    image: postgres:16.14-trixie
     env_file:
       - .env.prod
-
     volumes:
-      - postgres_prod:/var/lib/postgresql/data
-
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-backsom}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 10s
-
     restart: unless-stopped
-
     networks:
-      - webnet
-
+      - som_internal
 
 volumes:
-  postgres_prod:
-
+  postgres_data:
 
 networks:
-  webnet:
+  som_internal:
+    internal: true
+  som_egress:

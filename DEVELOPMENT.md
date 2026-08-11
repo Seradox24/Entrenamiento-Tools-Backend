@@ -7,16 +7,38 @@ Reglas del proyecto:
 - `requirements.txt` debe representar siempre el estado actual de `.venv`.
 - Tailwind se compila localmente con npm. No usar Tailwind por CDN.
 - Despues de cambiar clases Tailwind, ejecutar `npm.cmd run css:build` o dejar `npm.cmd run css:watch` activo.
-- Mantener SQLite como base por defecto durante esta etapa.
+- Desarrollo y servidor usan el mismo archivo `compose.prod.yaml`.
+- PostgreSQL se ejecuta en el servicio privado `db` y persiste en el volumen `postgres_data`.
+- `.env.prod` debe existir en la raiz, pero nunca se agrega a Git.
 - Para trabajo con imagenes usar las librerias instaladas: `Pillow`, `django-imagekit` y `django-cleanup`.
 
-Comandos base:
+Levantar el sistema:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\python -m pip install -r requirements.txt
 npm.cmd install
 npm.cmd run css:build
-.\.venv\Scripts\python manage.py migrate
-.\.venv\Scripts\python manage.py runserver
+docker compose -f compose.prod.yaml up --build
+```
+
+Ejecutarlo en segundo plano:
+
+```powershell
+docker compose -f compose.prod.yaml up -d --build
+docker compose -f compose.prod.yaml logs -f web
+```
+
+Detenerlo sin eliminar los datos PostgreSQL:
+
+```powershell
+docker compose -f compose.prod.yaml down
+```
+
+Las migraciones y `collectstatic` se ejecutan automaticamente antes de iniciar Gunicorn.
+
+Para administrar Django dentro del contenedor:
+
+```powershell
+docker compose -f compose.prod.yaml exec web python manage.py createsuperuser
+docker compose -f compose.prod.yaml exec web python manage.py check
+docker compose -f compose.prod.yaml exec web python manage.py test
 ```

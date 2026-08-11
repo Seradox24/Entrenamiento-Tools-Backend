@@ -1,9 +1,7 @@
-.env
 .env.prod
 .venv/
 __pycache__/
 *.py[cod]
-db.sqlite3
 media/
 staticfiles/
 node_modules/

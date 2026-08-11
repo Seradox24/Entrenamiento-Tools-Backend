@@ -5,14 +5,22 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, True),
-    ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
+    DEBUG=(bool, False),
+    ALLOWED_HOSTS=(list, []),
+    CSRF_TRUSTED_ORIGINS=(list, []),
+    SECURE_SSL_REDIRECT=(bool, False),
+    SESSION_COOKIE_SECURE=(bool, False),
+    CSRF_COOKIE_SECURE=(bool, False),
+    SECURE_HSTS_SECONDS=(int, 0),
+    SECURE_HSTS_INCLUDE_SUBDOMAINS=(bool, False),
+    SECURE_HSTS_PRELOAD=(bool, False),
 )
-environ.Env.read_env(BASE_DIR / ".env")
+environ.Env.read_env(BASE_DIR / ".env.prod")
 
-SECRET_KEY = env("SECRET_KEY", default="django-insecure-local-dev-change-me")
+SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -35,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -68,8 +77,8 @@ DATABASES = {
         "NAME": env("POSTGRES_DB", default="backsom"),
         "USER": env("POSTGRES_USER", default="postgres"),
         "PASSWORD": env("POSTGRES_PASSWORD", default=""),
-        "HOST": env("POSTGRES_HOST", default="db"),
-        "PORT": env.int("POSTGRES_PORT", default=5432),
+        "HOST": env("DATABASE_HOST", default="db"),
+        "PORT": env.int("DATABASE_PORT", default=5432),
     }
 }
 
@@ -93,12 +102,30 @@ TIME_ZONE = "America/Santiago"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "/static/"
+STATIC_URL = "/som/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-MEDIA_URL = "/media/"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+MEDIA_URL = "/som/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+SECURE_SSL_REDIRECT = env("SECURE_SSL_REDIRECT")
+SESSION_COOKIE_SECURE = env("SESSION_COOKIE_SECURE")
+CSRF_COOKIE_SECURE = env("CSRF_COOKIE_SECURE")
+SECURE_HSTS_SECONDS = env("SECURE_HSTS_SECONDS")
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env("SECURE_HSTS_INCLUDE_SUBDOMAINS")
+SECURE_HSTS_PRELOAD = env("SECURE_HSTS_PRELOAD")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
