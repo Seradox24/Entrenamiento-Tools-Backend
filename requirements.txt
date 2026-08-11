@@ -5,9 +5,12 @@ django-cleanup==9.0.0
 django-environ==0.14.0
 django-imagekit==6.1.0
 djangorestframework==3.17.1
+gunicorn==26.0.0
 packaging==26.2
 pilkit==3.0
 pillow==12.3.0
+psycopg==3.3.4
+psycopg-binary==3.3.4
 setuptools==82.0.1
 sqlparse==0.5.5
 tzdata==2026.2
