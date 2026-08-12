@@ -1,9 +1,18 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
-from django.core.validators import URLValidator
+from django.core.validators import EmailValidator, URLValidator
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
 from .constants import SCHEMA_VERSION, SUPPORTED_EVENTS
+
+
+USER_STRING_FIELDS = {
+    "username": 255,
+    "idnumber": 255,
+    "firstname": 255,
+    "lastname": 255,
+    "email": 254,
+}
 
 
 class EventPayloadValidationError(ValueError):
@@ -27,6 +36,33 @@ def _validate_resource_object(resource, name, errors):
     resource_id = value.get("id")
     if not _is_integer(resource_id) or resource_id <= 0:
         errors[f"{field_name}.id"] = "Debe ser un entero positivo."
+
+    if name != "user":
+        return
+
+    for source_name, max_length in USER_STRING_FIELDS.items():
+        if source_name not in value or value[source_name] is None:
+            continue
+        if not isinstance(value[source_name], str):
+            errors[f"{field_name}.{source_name}"] = "Debe ser un texto."
+        elif len(value[source_name]) > max_length:
+            errors[f"{field_name}.{source_name}"] = (
+                f"No puede superar los {max_length} caracteres."
+            )
+        elif source_name == "email" and value[source_name]:
+            try:
+                EmailValidator()(value[source_name])
+            except DjangoValidationError:
+                errors[f"{field_name}.{source_name}"] = (
+                    "Debe ser un correo electronico valido."
+                )
+
+    for source_name in ("suspended", "deleted"):
+        if source_name not in value or value[source_name] is None:
+            continue
+        flag_value = value[source_name]
+        if not isinstance(flag_value, (bool, int)) or flag_value not in (0, 1):
+            errors[f"{field_name}.{source_name}"] = "Debe ser 0, 1 o booleano."
 
 
 def validate_event_payload(payload):
@@ -112,7 +148,7 @@ def validate_event_payload(payload):
         "event_name": event_name,
         "action": action,
         "occurred_at": occurred_at,
-        "site_url": site_url,
+        "site_url": site_url.rstrip("/"),
         "actor_user_id": actor_user_id,
         "resource": resource,
     }

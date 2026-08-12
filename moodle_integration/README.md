@@ -25,3 +25,18 @@ nunca debe guardarse en Git.
 pesadas: guarda el payload con auditoria y deja el registro en estado
 `received` para que un procesador en segundo plano pueda consumirlo en el
 futuro. Los registros pueden consultarse, sin modificarlos, desde Django Admin.
+
+## Usuarios Moodle
+
+Cada evento proyecta `resource.user` en `MoodleUser`, identificado de forma
+unica por el sitio Moodle y el ID del usuario. Las actualizaciones parciales
+conservan la informacion conocida, y los eventos antiguos no revierten el
+estado actual si llegan fuera de orden.
+
+Los usuarios nunca se eliminan fisicamente. `user_deleted`, `deleted=1` y
+`suspended=1` se reflejan mediante `is_deleted` e `is_suspended`, conservando
+el perfil para usos posteriores como LRS. Tanto el modelo como Django Admin
+bloquean su eliminacion.
+
+El contrato detallado del modelo, sus estados y reglas de sincronizacion se
+encuentra en [`USERS.md`](USERS.md).
