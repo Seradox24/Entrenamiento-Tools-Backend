@@ -28,6 +28,7 @@ som_urlpatterns = [
     path("home/users/new/", normal_user_create, name="normal-user-create"),
     path("home/users/<int:pk>/edit/", normal_user_update, name="normal-user-update"),
     path("lrs/", include("lrs.urls")),
+    path("identity/", include("identity.urls")),
     path("moodle_integration/", include("moodle_integration.urls")),
     path("logout/", LogoutView.as_view(), name="logout"),
     path("admin/", admin.site.urls),
