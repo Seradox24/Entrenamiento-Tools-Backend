@@ -1,0 +1,27 @@
+# Moodle integration
+
+Esta app recibe eventos enviados por `local_som_observer` sin acceder a la base
+de datos de Moodle ni importar codigo de otras apps del proyecto.
+
+## Endpoint
+
+`POST /som/moodle_integration/events/`
+
+La solicitud debe usar `Content-Type: application/json` y el encabezado
+`Authorization: Bearer <token>`. El proceso que ejecuta Django debe definir
+`MOODLE_WEBHOOK_TOKEN`; su valor debe coincidir con el configurado en Moodle y
+nunca debe guardarse en Git.
+
+## Entrega e idempotencia
+
+- `201`: el evento fue validado y almacenado.
+- `200`: `event_id` ya existia; se registro una nueva entrega sin duplicar el
+  evento.
+- `400`: JSON o contrato invalido, o evento no soportado.
+- `401`: token ausente o incorrecto.
+- `503`: el backend no tiene configurado `MOODLE_WEBHOOK_TOKEN`.
+
+`MoodleEvent` funciona como bandeja durable. El endpoint no ejecuta tareas
+pesadas: guarda el payload con auditoria y deja el registro en estado
+`received` para que un procesador en segundo plano pueda consumirlo en el
+futuro. Los registros pueden consultarse, sin modificarlos, desde Django Admin.
