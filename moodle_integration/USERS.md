@@ -114,7 +114,8 @@ Los superusuarios pueden consultar los perfiles desde:
 
 La vista permite buscar por ID, usuario, identificador institucional, nombre o
 correo, y filtrar por sitio, suspension o eliminacion. Todos los campos son de
-solo lectura.
+solo lectura. Los estados normales (`Activo` y `No eliminado`) se muestran en
+verde; `Suspendido` y `Eliminado` se muestran en rojo.
 
 ## Ejemplos de consulta interna
 

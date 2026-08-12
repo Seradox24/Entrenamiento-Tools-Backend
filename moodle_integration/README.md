@@ -40,3 +40,8 @@ bloquean su eliminacion.
 
 El contrato detallado del modelo, sus estados y reglas de sincronizacion se
 encuentra en [`USERS.md`](USERS.md).
+
+El diseño pendiente para reunir varias cuentas Moodle historicas bajo una
+identidad canonica se conserva en
+[`FUTURE_IDENTITY_RELINKING.md`](FUTURE_IDENTITY_RELINKING.md). Esa
+funcionalidad aun no esta implementada.

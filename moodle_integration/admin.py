@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import MoodleEvent, MoodleUser
 
@@ -41,8 +42,8 @@ class MoodleUserAdmin(admin.ModelAdmin):
         "full_name",
         "email",
         "site_url",
-        "is_suspended",
-        "is_deleted",
+        "suspension_status",
+        "deletion_status",
         "last_seen_at",
     )
     list_filter = ("site_url", "is_suspended", "is_deleted")
@@ -55,7 +56,49 @@ class MoodleUserAdmin(admin.ModelAdmin):
         "email",
     )
     ordering = ("site_url", "moodle_user_id")
-    readonly_fields = tuple(field.name for field in MoodleUser._meta.fields)
+    readonly_fields = (
+        "id",
+        "site_url",
+        "moodle_user_id",
+        "username",
+        "idnumber",
+        "first_name",
+        "last_name",
+        "email",
+        "raw_profile",
+        "suspension_status",
+        "deletion_status",
+        "suspended_at",
+        "deleted_at",
+        "first_seen_at",
+        "last_seen_at",
+        "last_synced_at",
+        "last_event",
+    )
+
+    class Media:
+        css = {"all": ("moodle_integration/admin.css",)}
+
+    @staticmethod
+    def _status_badge(label, danger):
+        modifier = "danger" if danger else "ok"
+        return format_html(
+            '<span class="moodle-status moodle-status--{}">{}</span>',
+            modifier,
+            label,
+        )
+
+    @admin.display(description="Suspension", ordering="is_suspended")
+    def suspension_status(self, obj):
+        if obj.is_suspended:
+            return self._status_badge("Suspendido", danger=True)
+        return self._status_badge("Activo", danger=False)
+
+    @admin.display(description="Eliminacion", ordering="is_deleted")
+    def deletion_status(self, obj):
+        if obj.is_deleted:
+            return self._status_badge("Eliminado", danger=True)
+        return self._status_badge("No eliminado", danger=False)
 
     def has_add_permission(self, request):
         return False

@@ -591,6 +591,17 @@ class MoodleEventAdminTests(TestCase):
             last_seen_at="2026-08-12T03:30:00Z",
             last_event=event,
         )
+        deleted_user = MoodleUser.objects.create(
+            site_url="https://169.58.128.68",
+            moodle_user_id=26,
+            username="usuario-eliminado",
+            is_suspended=True,
+            is_deleted=True,
+            suspended_at="2026-08-12T03:30:00Z",
+            deleted_at="2026-08-12T03:30:00Z",
+            last_seen_at="2026-08-12T03:30:00Z",
+            last_event=event,
+        )
         self.client.force_login(admin_user)
 
         list_response = self.client.get(
@@ -602,6 +613,12 @@ class MoodleEventAdminTests(TestCase):
                 args=[moodle_user.pk],
             )
         )
+        deleted_detail_response = self.client.get(
+            reverse(
+                "admin:moodle_integration_moodleuser_change",
+                args=[deleted_user.pk],
+            )
+        )
         delete_response = self.client.get(
             reverse(
                 "admin:moodle_integration_moodleuser_delete",
@@ -611,6 +628,20 @@ class MoodleEventAdminTests(TestCase):
 
         self.assertEqual(list_response.status_code, 200)
         self.assertContains(list_response, moodle_user.username)
+        self.assertContains(list_response, "moodle_integration/admin.css")
+        self.assertContains(list_response, "moodle-status--ok", count=2)
+        self.assertContains(list_response, "Activo")
+        self.assertContains(list_response, "No eliminado")
+        self.assertContains(list_response, "moodle-status--danger", count=2)
+        self.assertContains(list_response, "Suspendido")
+        self.assertContains(list_response, "Eliminado")
         self.assertEqual(detail_response.status_code, 200)
         self.assertContains(detail_response, moodle_user.email)
+        self.assertContains(detail_response, "moodle-status--ok", count=2)
+        self.assertEqual(deleted_detail_response.status_code, 200)
+        self.assertContains(
+            deleted_detail_response,
+            "moodle-status--danger",
+            count=2,
+        )
         self.assertEqual(delete_response.status_code, 403)
